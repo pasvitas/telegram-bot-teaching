@@ -1,20 +1,21 @@
 package ru.pasvitas.telegrambotteaching.commands;
 
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.pasvitas.telegrambotteaching.model.OutputMessageInfo;
+import ru.pasvitas.telegrambotteaching.model.SourceType;
+import ru.pasvitas.telegrambotteaching.service.SendService;
 
-public abstract class BotCommand implements CommandExcutor {
+public abstract class BotCommand implements CommandExecutor {
 
-    protected void sendMessage(String chatId, String message, TelegramLongPollingBot bot) {
-        SendMessage sendMessage = new SendMessage(); // Create a SendMessage object with mandatory fields
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(message);
+    private final SendService sendMessage;
 
-        try {
-            bot.execute(sendMessage); // Call method to send the message
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+    protected BotCommand(SendService sendMessage) {
+        this.sendMessage = sendMessage;
+    }
+
+    protected void sendMessage(String chatId, String message, SourceType sourceType) {
+        OutputMessageInfo outputMessageInfo = new OutputMessageInfo(
+                chatId, message
+        );
+        sendMessage.sendMessage(outputMessageInfo, sourceType);
     }
 }

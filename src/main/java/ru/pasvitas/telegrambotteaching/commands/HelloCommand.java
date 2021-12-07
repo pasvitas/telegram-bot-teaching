@@ -1,9 +1,15 @@
 package ru.pasvitas.telegrambotteaching.commands;
 
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.User;
+import ru.pasvitas.telegrambotteaching.model.InputMessageInfo;
+import ru.pasvitas.telegrambotteaching.model.SourceType;
+import ru.pasvitas.telegrambotteaching.service.SendService;
 
-public class HelloCommand extends BotCommand {
+public class HelloCommand extends BotCommand implements UserInfoGiver {
+
+    public HelloCommand(SendService service) {
+        super(service);
+    }
 
     @Override
     public String getCommandName() {
@@ -11,7 +17,14 @@ public class HelloCommand extends BotCommand {
     }
 
     @Override
-    public void executeCommand(String chatId, Message message, TelegramLongPollingBot bot) {
-        sendMessage(chatId, "Привет, " + message.getFrom().getFirstName(), bot);
+    public void executeCommand(InputMessageInfo inputMessageInfo, SourceType sourceType) {
+        sendMessage(inputMessageInfo.getChannelId(),
+                "Привет, " + inputMessageInfo.getUser().getName(),
+                sourceType);
+    }
+
+    @Override
+    public String getUserInfo(User user) {
+        return user.getFirstName() + " " + user.getLastName();
     }
 }
